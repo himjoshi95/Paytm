@@ -8,7 +8,7 @@ mongoose.connect(url)
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         trim: true,
         lowercase: true,
@@ -17,25 +17,39 @@ const userSchema = new mongoose.Schema({
     },
     firstName: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         maxLength:50
     },
     lastName: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         maxLength:50
     },
     password: {
         type: String,
-        require: true,
+        required: true,
         minLength:3
     }
 })
 
+const accountSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required:true
+    },
+    balance: {
+        type: Number,
+        required:true
+    }
+})
+
 const User = mongoose.model('User', userSchema)
+const Account = mongoose.model('Account',accountSchema)
 
 module.exports = {
-    User
+    User,
+    Account
 }
