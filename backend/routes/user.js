@@ -84,10 +84,44 @@ router.post('/signin', async (req, res) => {
     }   
 })
 
-router.get('/', authMiddleware, (req, res) => {
+const updateBodySchema = zod.object({
+    firstName: zod.string().min(3).max(50).optional(),
+    lastName: zod.string().min(3).max(50).optional(),
+    password: zod.string().min(3).optional()
+})
+
+router.put('/', authMiddleware, async(req, res) => {
+    const { success, error } = updateBodySchema.safeParse(req.body)
+    if (!success) {
+        return res.status(411).json({
+            message: "Invalid Input Format",
+            error
+        })
+    }
+    const userId = req.userId
+    await User.updateOne({ _id: userId }, req.body)
     return res.json({
-        userID:req.userId
+        message: "Updated Successfully"
     })
+})
+
+router.get('/bulk', authMiddleware, async(req, res) => {
+    const filter = req.query.filter || ""
+    
+    const users = await User.find({
+        $or: [
+            {firstName:{"$regex": filter}},
+            {lastName:{"$regex":filter}}
+        ]
+    })
+    res.json({
+        users: users.map(user => ({
+            _id: user._id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName
+        }))
+    })     
 })
 
 
