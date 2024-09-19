@@ -5,6 +5,7 @@ const { User } = require('../db')
 const zod = require('zod')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const authMiddleware =  require('../middleware')
 
 
 const signupSchema = zod.object({
@@ -83,6 +84,11 @@ router.post('/signin', async (req, res) => {
     }   
 })
 
+router.get('/', authMiddleware, (req, res) => {
+    return res.json({
+        userID:req.userId
+    })
+})
 
 
 
